@@ -49,12 +49,19 @@ export const handleSendIdeaNotification: RequestHandler = async (req, res) => {
       });
     }
 
-    const { ideaTitle, ideaDescription, authorName } = req.body;
+    const {
+      ideaTitle,
+      ideaDescription,
+      phoneNumber,
+      budget,
+      requirements,
+      authorName
+    } = req.body;
 
     // Validation basique
-    if (!ideaTitle || !ideaDescription) {
+    if (!ideaTitle || !ideaDescription || !phoneNumber) {
       return res.status(400).json({
-        error: "ideaTitle et ideaDescription sont requis",
+        error: "ideaTitle, ideaDescription et phoneNumber sont requis",
       });
     }
 
@@ -68,6 +75,13 @@ export const handleSendIdeaNotification: RequestHandler = async (req, res) => {
 ${ideaDescription}
 
 👤 *Auteur:* ${authorName || "Anonyme"}
+
+📱 *Téléphone:* ${phoneNumber}
+
+${budget ? `💰 *Budgét proposé:* ${budget} DH` : ""}
+
+${requirements ? `🔧 *Ressources nécessaires:*
+${requirements}` : ""}
 
 ⏰ *Date/Heure:* ${new Date().toLocaleString("fr-MA")}
     `.trim();
