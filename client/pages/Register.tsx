@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import Header from "@/components/Header";
 import { generateMemberId } from "../lib/memberIdGenerator";
 
@@ -19,6 +20,8 @@ export default function Register() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [patrols, setPatrols] = useState<PatrolOption[]>([]);
   const [roles, setRoles] = useState<RoleOption[]>([]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -746,17 +749,30 @@ export default function Register() {
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                       كلمة المرور <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="أدخل كلمة مرور قوية (8 أحرف على الأقل)"
-                      minLength={8}
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 ${
-                        errors.password ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="أدخل كلمة مرور قوية (8 أحرف على الأقل)"
+                        minLength={8}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 ${
+                          errors.password ? "border-red-500" : "border-gray-300"
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
                     {errors.password && (
                       <p className="text-red-500 text-sm mt-1">{errors.password}</p>
                     )}
@@ -766,17 +782,30 @@ export default function Register() {
                     <label className="block text-sm font-bold text-gray-700 mb-2 mt-4">
                       تأكيد كلمة المرور <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      placeholder="أعد كتابة كلمة المرور"
-                      minLength={8}
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 ${
-                        errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        placeholder="أعد كتابة كلمة المرور"
+                        minLength={8}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 ${
+                          errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
                     {errors.confirmPassword && (
                       <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
                     )}
