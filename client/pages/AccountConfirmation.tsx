@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
@@ -38,6 +38,19 @@ export default function AccountConfirmation() {
   const userId: string = location.state?.userId || "";
   const memberId: string = location.state?.memberId || generateMemberId(registrationData.gender || "male");
 
+  // Format birth date for display
+  const formattedBirthDate = registrationData.birthDate
+    ? new Date(registrationData.birthDate).toLocaleDateString("ar-MA")
+    : undefined;
+
+  // Auto-generate PDF on mount
+  useEffect(() => {
+    if (!pdfGenerated && userId && registrationData.firstName) {
+      const timer = setTimeout(() => generatePDF(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   // Redirect if no data provided
   if (!userId || !registrationData.firstName) {
     return (
@@ -64,14 +77,19 @@ export default function AccountConfirmation() {
 
       // Show PDF element temporarily for capture
       if (pdfRef.current) {
-        pdfRef.current.style.display = "block";
+        const parent = pdfRef.current.parentElement;
+        // Make it visible but off-screen for capture
+        pdfRef.current.style.visibility = "visible";
         pdfRef.current.style.position = "absolute";
-        pdfRef.current.style.left = "-9999px";
+        pdfRef.current.style.top = "0";
+        pdfRef.current.style.left = "0";
         pdfRef.current.style.width = "794px"; // A4 width at 96 DPI
+        pdfRef.current.style.zIndex = "-999";
+        if (parent) parent.style.position = "relative";
       }
 
-      // Wait for rendering
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for rendering and fonts to load
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Capture the PDF document with html2canvas
       if (pdfRef.current) {
@@ -79,10 +97,12 @@ export default function AccountConfirmation() {
           scale: 2,
           logging: false,
           useCORS: true,
+          allowTaint: true,
           backgroundColor: "#ffffff",
-          windowWidth: 794, // A4 width in pixels at 96 DPI
-          windowHeight: 1123, // A4 height in pixels at 96 DPI
-          imageTimeout: 0,
+          width: 794, // A4 width in pixels at 96 DPI
+          height: 1123, // A4 height in pixels at 96 DPI
+          imageTimeout: 5000,
+          foreignObjectRendering: true,
         });
 
         // Generate PDF from captured image
@@ -152,7 +172,8 @@ export default function AccountConfirmation() {
 
         // Hide PDF element after capture
         if (pdfRef.current) {
-          pdfRef.current.style.display = "none";
+          pdfRef.current.style.visibility = "hidden";
+          pdfRef.current.style.position = "static";
         }
 
         setPdfGenerated(true);
@@ -175,7 +196,7 @@ export default function AccountConfirmation() {
       <Header />
 
       {/* Hidden PDF Document for capture */}
-      <div style={{ display: "none" }}>
+      <div style={{ visibility: "hidden", position: "absolute", top: "-10000px", left: "-10000px" }}>
         <PdfDocument
           ref={pdfRef}
           firstName={registrationData.firstName || ""}
@@ -183,7 +204,7 @@ export default function AccountConfirmation() {
           memberId={memberId}
           userId={userId}
           phone={registrationData.userPhone || ""}
-          birthDate={registrationData.birthDate}
+          birthDate={formattedBirthDate}
           gender={registrationData.gender}
           patrol={registrationData.patrol}
           role={registrationData.role}
