@@ -68,10 +68,10 @@ export const handleRegister: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // Calculate age from birth_date
+    // Calculate age locally for response (don't store in DB)
     const age = calculateAge(birth_date);
 
-    // Insert into users table
+    // Insert into users table - NO 'age' field, it will be calculated on demand
     const { data, error } = await getSupabaseClient()
       .from("users")
       .insert([
@@ -79,7 +79,6 @@ export const handleRegister: RequestHandler = async (req, res) => {
           first_name,
           last_name,
           birth_date,
-          age,
           gender,
           user_phone,
           patrol_id,
@@ -107,7 +106,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
         .json({ error: error.message || "Registration failed" });
     }
 
-    // Return user data
+    // Return user data with calculated age
     res.json({
       id: data.id,
       generated_id: data.generated_id,
@@ -115,7 +114,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
       last_name: data.last_name,
       user_phone: data.user_phone,
       gender: data.gender,
-      age: data.age,
+      age: age,
     });
   } catch (error) {
     console.error("Error registering user:", error);

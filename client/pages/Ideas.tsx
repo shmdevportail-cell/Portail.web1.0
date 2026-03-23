@@ -7,7 +7,6 @@ export default function Ideas() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    phone: "+212",
     budget: "",
     requirements: "",
   });
@@ -15,16 +14,6 @@ export default function Ideas() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Validate Moroccan phone number format
-  const validatePhoneNumber = (phone: string): boolean => {
-    // Remove +212 prefix and get the rest
-    const phoneDigits = phone.replace("+212", "");
-
-    // Check if it matches mobile (6 or 7) or fixed line (5 or 8) format with 9 digits total
-    const phoneRegex = /^[5678]\d{8}$/;
-    return phoneRegex.test(phoneDigits);
-  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
