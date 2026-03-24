@@ -41,9 +41,6 @@ export default function Ideas() {
     if (formData.description.trim().length < 20) {
       newErrors.description = "الشرح يجب أن يكون أطول (20 حرف على الأقل)";
     }
-    if (!validatePhoneNumber(formData.phone)) {
-      newErrors.phone = "رقم الهاتف غير صحيح (استخدم 06/07 للجوال و05/08 للخط الثابت)";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -66,7 +63,6 @@ export default function Ideas() {
         body: JSON.stringify({
           ideaTitle: formData.title,
           ideaDescription: formData.description,
-          phoneNumber: formData.phone,
           budget: formData.budget,
           requirements: formData.requirements,
           authorName: user?.first_name || "Anonyme",
@@ -76,7 +72,7 @@ export default function Ideas() {
       console.log("Idea submitted:", formData);
       setSubmitted(true);
       setTimeout(() => {
-        setFormData({ title: "", description: "", phone: "+212", budget: "", requirements: "" });
+        setFormData({ title: "", description: "", budget: "", requirements: "" });
         setSubmitted(false);
       }, 3000);
     } catch (error) {
@@ -180,51 +176,6 @@ export default function Ideas() {
                 </div>
               </div>
 
-              {/* Phone Number */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  رقم الهاتف <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value="+212"
-                    disabled
-                    className="w-16 px-3 py-3 border border-gray-300 rounded-lg bg-gray-100 text-center font-semibold"
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone.replace("+212", "")}
-                    onChange={(e) => {
-                      const digits = e.target.value.replace(/[^\d]/g, "").slice(0, 9);
-                      setFormData((prev) => ({
-                        ...prev,
-                        phone: "+212" + digits,
-                      }));
-                      setErrors((prev) => ({
-                        ...prev,
-                        phone: "",
-                      }));
-                    }}
-                    placeholder="6xxxxxxxx"
-                    inputMode="numeric"
-                    pattern="\d*"
-                    maxLength="9"
-                    className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all ${
-                      errors.phone ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                </div>
-                <div className="mt-2">
-                  {errors.phone && (
-                    <p className="text-red-500 text-sm">{errors.phone}</p>
-                  )}
-                  <p className="text-xs text-gray-500 mt-1">
-                    جوال: 06xxxxx أو 07xxxxx | خط ثابت: 05xxxxx أو 08xxxxx
-                  </p>
-                </div>
-              </div>
 
               {/* Budget */}
               <div>

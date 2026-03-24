@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import Header from "@/components/Header";
+import { PhoneInput } from "@/components/PhoneInput";
 import { generateMemberId } from "../lib/memberIdGenerator";
 
 interface PatrolOption {
@@ -504,39 +505,19 @@ export default function Register() {
               <div className="bg-white rounded-lg shadow-md p-6 space-y-4 border-t-4 border-gradient-to-r from-red-600 to-purple-600">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">معلومات الاتصال</h2>
 
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    رقم هاتفك
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value="+212"
-                      disabled
-                      className="w-16 px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-center font-semibold"
-                    />
-                    <input
-                      type="text"
-                      name="userPhone"
-                      value={formData.userPhone.replace("+212", "")}
-                      onChange={(e) => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          userPhone: "+212" + e.target.value.slice(0, 9),
-                        }));
-                        setErrors((prev) => ({ ...prev, userPhone: "" }));
-                      }}
-                      placeholder="6xx xxx xxx"
-                      maxLength="9"
-                      className={`flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 ${
-                        errors.userPhone ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                  </div>
-                  {errors.userPhone && (
-                    <p className="text-red-500 text-sm mt-1">{errors.userPhone}</p>
-                  )}
-                </div>
+                <PhoneInput
+                  name="userPhone"
+                  value={formData.userPhone}
+                  onChange={(value) => {
+                    setFormData((prev) => ({ ...prev, userPhone: value }));
+                    setErrors((prev) => ({ ...prev, userPhone: "" }));
+                  }}
+                  label="رقم هاتفك"
+                  required
+                  type="mobile"
+                  error={errors.userPhone}
+                  placeholder="6xxxxxxxx"
+                />
 
                 <div className="flex gap-3 mt-6">
                   <button
@@ -685,47 +666,44 @@ export default function Register() {
                   <p className="text-sm text-gray-700">أرقام الهواتف الإضافية (اختياري)</p>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    هاتف الأب
-                  </label>
-                  <input
-                    type="tel"
-                    name="fatherPhone"
-                    value={formData.fatherPhone}
-                    onChange={handleChange}
-                    placeholder="+212 6xx xxx xxx"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
-                  />
-                </div>
+                <PhoneInput
+                  name="fatherPhone"
+                  value={formData.fatherPhone}
+                  onChange={(value) => {
+                    setFormData((prev) => ({ ...prev, fatherPhone: value }));
+                    setErrors((prev) => ({ ...prev, fatherPhone: "" }));
+                  }}
+                  label="هاتف الأب"
+                  type="mobile"
+                  error={errors.fatherPhone}
+                  placeholder="6xxxxxxxx"
+                />
 
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    هاتف الأم
-                  </label>
-                  <input
-                    type="tel"
-                    name="motherPhone"
-                    value={formData.motherPhone}
-                    onChange={handleChange}
-                    placeholder="+212 6xx xxx xxx"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
-                  />
-                </div>
+                <PhoneInput
+                  name="motherPhone"
+                  value={formData.motherPhone}
+                  onChange={(value) => {
+                    setFormData((prev) => ({ ...prev, motherPhone: value }));
+                    setErrors((prev) => ({ ...prev, motherPhone: "" }));
+                  }}
+                  label="هاتف الأم"
+                  type="mobile"
+                  error={errors.motherPhone}
+                  placeholder="6xxxxxxxx"
+                />
 
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    هاتف المنزل (اختياري)
-                  </label>
-                  <input
-                    type="tel"
-                    name="homePhone"
-                    value={formData.homePhone}
-                    onChange={handleChange}
-                    placeholder="رقم هاتف ثابت"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
-                  />
-                </div>
+                <PhoneInput
+                  name="homePhone"
+                  value={formData.homePhone}
+                  onChange={(value) => {
+                    setFormData((prev) => ({ ...prev, homePhone: value }));
+                    setErrors((prev) => ({ ...prev, homePhone: "" }));
+                  }}
+                  label="هاتف المنزل (اختياري)"
+                  type="fixed"
+                  error={errors.homePhone}
+                  placeholder="5xxxxxxxx"
+                />
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
