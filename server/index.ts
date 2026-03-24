@@ -20,6 +20,28 @@ export function createServer() {
     res.json({ message: ping });
   });
 
+  // Debug endpoint - check environment variables
+  app.get("/api/debug/env", (_req, res) => {
+    console.log("=== ENVIRONMENT VARIABLES CHECK ===");
+    const env = {
+      supabase: {
+        url: !!process.env.SUPABASE_URL,
+        anonKey: !!process.env.SUPABASE_ANON_KEY,
+        serviceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      },
+      twilio: {
+        accountSid: !!process.env.TWILIO_ACCOUNT_SID,
+        authToken: !!process.env.TWILIO_AUTH_TOKEN,
+        phoneNumber: !!process.env.TWILIO_PHONE_NUMBER,
+        adminWhatsApp: !!process.env.ADMIN_WHATSAPP,
+      },
+      ping: !!process.env.PING_MESSAGE,
+      nodeEnv: process.env.NODE_ENV,
+    };
+    console.log(JSON.stringify(env, null, 2));
+    res.json(env);
+  });
+
   app.get("/api/demo", handleDemo);
 
   // Authentication routes
