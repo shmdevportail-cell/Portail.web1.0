@@ -52,9 +52,16 @@ export const handleSendIdeaNotification: RequestHandler = async (req, res) => {
     // Vérifier que Twilio est configuré
     if (!accountSid || !authToken || !fromNumber || !adminWhatsApp) {
       console.error("❌ Twilio configuration incomplete!");
+      const missingVars = [];
+      if (!accountSid) missingVars.push("TWILIO_ACCOUNT_SID");
+      if (!authToken) missingVars.push("TWILIO_AUTH_TOKEN");
+      if (!fromNumber) missingVars.push("TWILIO_PHONE_NUMBER");
+      if (!adminWhatsApp) missingVars.push("ADMIN_WHATSAPP");
+
       return res.status(400).json({
         success: false,
         error: "Twilio configuration missing",
+        message: `Variables d'environnement manquantes: ${missingVars.join(", ")}`,
         missing: {
           accountSid: !accountSid,
           authToken: !authToken,
@@ -76,7 +83,9 @@ export const handleSendIdeaNotification: RequestHandler = async (req, res) => {
     if (!ideaTitle || !ideaDescription) {
       console.error("❌ Missing required fields");
       return res.status(400).json({
-        error: "ideaTitle et ideaDescription sont requis",
+        success: false,
+        error: "Missing required fields",
+        message: "Le titre et la description de l'idée sont obligatoires",
       });
     }
 
@@ -127,10 +136,20 @@ ${requirements}` : ""}
     if (!response.ok) {
       const errorText = await response.text();
       console.error("❌ Twilio error:", errorText);
+
+      // Try to parse Twilio error response
+      let twilioErrorMsg = errorText;
+      try {
+        const errorJson = JSON.parse(errorText);
+        twilioErrorMsg = errorJson.message || errorJson.error || errorText;
+      } catch {
+        // Not JSON, use raw text
+      }
+
       return res.status(response.status).json({
         success: false,
-        error: "Failed to send WhatsApp message",
-        twilioError: errorText,
+        error: `Twilio Error: ${twilioErrorMsg}`,
+        message: `خطأ في إرسال الرسالة عبر WhatsApp: ${twilioErrorMsg}`,
       });
     }
 
@@ -144,10 +163,12 @@ ${requirements}` : ""}
     });
   } catch (error) {
     console.error("❌ Erreur lors de l'envoi Twilio:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     res.status(500).json({
       success: false,
-      error: "Erreur lors de l'envoi de la notification",
-      details: error instanceof Error ? error.message : "Unknown error",
+      error: "Server error",
+      message: `Une erreur s'est produite: ${errorMessage}`,
+      details: errorMessage,
     });
   }
 };

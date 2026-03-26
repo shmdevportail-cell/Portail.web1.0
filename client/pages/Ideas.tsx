@@ -76,8 +76,22 @@ export default function Ideas() {
 
       if (!response.ok) {
         console.error("❌ Server error:", responseData);
+
+        // Handle error message - prioritize message field, then error
+        let errorMessage = "خطأ غير معروف";
+
+        if (responseData.message) {
+          errorMessage = typeof responseData.message === "string"
+            ? responseData.message
+            : JSON.stringify(responseData.message);
+        } else if (responseData.error) {
+          errorMessage = typeof responseData.error === "string"
+            ? responseData.error
+            : JSON.stringify(responseData.error);
+        }
+
         setErrors({
-          submit: `خطأ من الخادم: ${responseData.error || "خطأ غير معروف"}`
+          submit: errorMessage
         });
         setLoading(false);
         return;
