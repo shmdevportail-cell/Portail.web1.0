@@ -56,26 +56,56 @@ export default function Ideas() {
     setLoading(true);
 
     try {
+      console.log("📤 Submitting idea...", formData);
+
       // Send via Twilio WhatsApp
-      await fetch("/api/ideas/send-notification", {
+      const response = await fetch("/api/ideas/send-notification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ideaTitle: formData.title,
           ideaDescription: formData.description,
+          budget: formData.budget,
+          requirements: formData.requirements,
           authorName: user?.first_name || "Anonyme",
         }),
-      }).catch(console.error);
+      });
 
-      console.log("Idea submitted:", formData);
+      const responseData = await response.json();
+      console.log("📨 Server response:", responseData);
+
+      if (!response.ok) {
+        console.error("❌ Server error:", responseData);
+
+        // Handle error message - prioritize message field, then error
+        let errorMessage = "خطأ غير معروف";
+
+        if (responseData.message) {
+          errorMessage = typeof responseData.message === "string"
+            ? responseData.message
+            : JSON.stringify(responseData.message);
+        } else if (responseData.error) {
+          errorMessage = typeof responseData.error === "string"
+            ? responseData.error
+            : JSON.stringify(responseData.error);
+        }
+
+        setErrors({
+          submit: errorMessage
+        });
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Idea sent successfully!");
       setSubmitted(true);
       setTimeout(() => {
         setFormData({ title: "", description: "", budget: "", requirements: "" });
         setSubmitted(false);
       }, 3000);
     } catch (error) {
-      console.error("Error submitting idea:", error);
-      setErrors({ submit: "حدث خطأ أثناء الإرسال. حاول لاحقاً." });
+      console.error("❌ Error submitting idea:", error);
+      setErrors({ submit: "حدث خطأ أثناء الإرسال. تحقق من وصلة الإنترنت." });
     } finally {
       setLoading(false);
     }
@@ -173,6 +203,7 @@ export default function Ideas() {
                   <p className="text-xs text-gray-500">{formData.description.length}/1000</p>
                 </div>
               </div>
+
 
               {/* Budget */}
               <div>

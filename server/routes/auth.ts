@@ -14,6 +14,20 @@ function getSupabaseClient() {
 }
 
 /**
+ * Calculate age from birth date
+ */
+function calculateAge(birthDate: string): number {
+  const birth = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+/**
  * Register a new user
  * Inserts user data into Supabase users table
  */
@@ -54,7 +68,10 @@ export const handleRegister: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // Insert into users table
+    // Calculate age locally for response (don't store in DB)
+    const age = calculateAge(birth_date);
+
+    // Insert into users table - NO 'age' field, it will be calculated on demand
     const { data, error } = await getSupabaseClient()
       .from("users")
       .insert([
@@ -89,7 +106,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
         .json({ error: error.message || "Registration failed" });
     }
 
-    // Return user data
+    // Return user data with calculated age
     res.json({
       id: data.id,
       generated_id: data.generated_id,
@@ -97,6 +114,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
       last_name: data.last_name,
       user_phone: data.user_phone,
       gender: data.gender,
+      age: age,
     });
   } catch (error) {
     console.error("Error registering user:", error);

@@ -9,7 +9,6 @@ interface MemberProfile {
   first_name: string;
   last_name: string;
   birth_date: string;
-  age: number;
   gender: string;
   patrol_name: string;
   role_name: string;
@@ -28,6 +27,18 @@ interface MemberProfile {
   documents_generated_at: string;
   created_at: string;
   updated_at: string;
+}
+
+// Helper function to calculate age
+function calculateAge(birthDate: string): number {
+  const birth = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
 }
 
 export default function MyProfile() {
@@ -207,7 +218,7 @@ export default function MyProfile() {
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase">العمر</p>
-                <p className="text-2xl font-bold text-green-600">{profile.age} سنة</p>
+                <p className="text-2xl font-bold text-green-600">{calculateAge(profile.birth_date)} سنة</p>
               </div>
             </div>
           </div>
